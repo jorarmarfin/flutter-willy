@@ -15,10 +15,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: DefaultTheme.base,
-      initialRoute: OpcionesScreen.routerName,
+      initialRoute: MaterialesScreen.routerName,
       routes: {
         HomeScreen.routerName: (context) => const HomeScreen(),
         OpcionesScreen.routerName: (context) => const OpcionesScreen(),
+        MaterialesScreen.routerName: (context) => const MaterialesScreen(),
       },
     );
   }
