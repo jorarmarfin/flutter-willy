@@ -44,8 +44,8 @@ class DefaultTheme {
           titleTextStyle:
               GoogleFonts.ptSans(fontSize: 20, color: Colors.white)),
       textTheme: TextTheme(
-          // headline1: GoogleFonts.akayaTelivigala(
-          //     fontSize: 60, color: colorTextColor, fontWeight: FontWeight.bold),
+          headline1: GoogleFonts.ptSans(
+              fontSize: 20, color: colorBlanco, fontWeight: FontWeight.bold),
           // headline2: GoogleFonts.josefinSans(fontSize: 20, color: Colors.white),
           // headline3: GoogleFonts.josefinSans(
           //     fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
@@ -73,10 +73,10 @@ BoxDecoration fondoScreen(String fondo) {
   );
 }
 
-BoxDecoration estiloRecuadro(color) {
+BoxDecoration estiloRecuadro(color,radio) {
   return BoxDecoration(
     color: color,
-    borderRadius: BorderRadius.circular(20),
+    borderRadius: BorderRadius.circular(radio),
   );
 }
 

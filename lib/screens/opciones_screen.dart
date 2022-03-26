@@ -2,6 +2,10 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_willy/themes/default_theme.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../providers/providers.dart';
 
 class OpcionesScreen extends StatelessWidget {
   const OpcionesScreen({Key? key}) : super(key: key);
@@ -10,6 +14,14 @@ class OpcionesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.pushNamed(context, 'contacto');
+        },
+        label: const Text('Contactame'),
+        icon: const Icon(Icons.thumb_up),
+        backgroundColor: Colors.pink,
+      ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -27,8 +39,7 @@ class OpcionesScreen extends StatelessWidget {
                   width: 100,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
+              Expanded(
                 child: Text(
                   'Siempre Firmes en la Fe',
                   style: DefaultTheme.base.textTheme.headline6,
@@ -61,12 +72,12 @@ class _ListaOpciones extends StatelessWidget {
         Opcion(
           icono: FontAwesomeIcons.podcast,
           texto: 'Predicas y reflexiones',
-          enlace: 'google',
+          enlace: 'predicas',
         ),
         Opcion(
           icono: FontAwesomeIcons.addressCard,
           texto: 'Cursos',
-          enlace: 'google',
+          enlace: 'cursos',
         )
       ]),
     );
@@ -99,7 +110,11 @@ class Opcion extends StatelessWidget {
           ),
           trailing: const Icon(Icons.more_vert, color: colorPrimaryColor),
           onTap: () {
-            Navigator.pushNamed(context, enlace);
+            if (enlace == 'predicas') {
+              _launchURLBrowser("https://anchor.fm/willy-martinez-sanchez/");
+            } else {
+              Navigator.pushNamed(context, enlace);
+            }
           },
         ),
       ),
@@ -114,19 +129,50 @@ class _Banner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final _wpProvider = Provider.of<WordpressProvider>(context, listen: false);
+
+    return SizedBox(
       height: 150,
-      child: Swiper(
-        itemBuilder: (BuildContext context, int index) {
-          return Image.network(
-            "https://img.youtube.com/vi/5NftwSw3BZ0/mqdefault.jpg",
-            fit: BoxFit.fill,
+      child: FutureBuilder(
+        future: _wpProvider.getBanners(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          return Swiper(
+            itemBuilder: (BuildContext context, int index) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else {
+                return GestureDetector(
+                  onTap: () {
+                    _launchURLBrowser(
+                        _wpProvider.bannerWordpress[index].enlace);
+                  },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20.0),
+                    child: Container(
+                      decoration: estiloRecuadro(colorBlanco, 20.0),
+                      child: Image.network(
+                        _wpProvider.bannerWordpress[index].imagen,
+                        fit: BoxFit.fill,
+                      ),
+                    ),
+                  ),
+                );
+              }
+            },
+            itemCount: _wpProvider.bannerWordpress.length,
+            viewportFraction: 0.8,
+            scale: 0.9,
           );
         },
-        itemCount: 10,
-        viewportFraction: 0.8,
-        scale: 0.9,
       ),
     );
+  }
+}
+
+void _launchURLBrowser(String _url) async {
+  if (await canLaunch(_url)) {
+    await launch(_url);
+  } else {
+    throw 'Could not launch $_url';
   }
 }
